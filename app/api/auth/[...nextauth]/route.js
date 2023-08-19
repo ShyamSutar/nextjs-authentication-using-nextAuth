@@ -1,6 +1,7 @@
-import { addAction } from "@/app/_action";
+import { addAction, customLogin } from "@/app/_action";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { signIn } from "next-auth/react";
 
 const authOptions = {
@@ -8,8 +9,34 @@ const authOptions = {
         GoogleProvider({
           clientId: process.env.GOOGLE_CLIENT_ID,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET
-        })
+        }),
+
+        CredentialsProvider({
+          name: "credentials",
+          credential: {},
+
+          async authorize(credentials){
+            const {uemail, upassword} = credentials
+            try {
+              const user = await customLogin(uemail, upassword)
+              return user;
+
+            } catch (error) {
+              console.log(error);
+            }
+
+          },
+        }),
       ],
+
+      session: {
+        strategy: "jwt",
+
+      },
+      secret: process.env.NEXTAUTH_SECRET,
+      pages:{
+        signIn: "/"
+      },
       
       callbacks: {
         async signIn({user, account}){
