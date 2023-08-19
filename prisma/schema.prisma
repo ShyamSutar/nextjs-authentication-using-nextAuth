@@ -10,3 +10,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Add{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String @unique
+  name String
+  createdAt DateTime @default(now())
+  }
+
